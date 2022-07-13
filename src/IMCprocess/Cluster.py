@@ -66,7 +66,7 @@ def runPhenograph(adata, k=30):
     return adata
 
 
-def transfer_property(adata1, adata2):
+def copy_property(adata1, adata2):
     """
 
     To transfer property from adata1 to adata2
@@ -113,4 +113,7 @@ def main_clustering(adata, markers):
     # 5. Embedding the neighborhood graph with UMAP
     sc.tl.umap(adata_markers)
 
-    # 6. add new property from clustering into full markers exprs table of anndata
+    # 6. copy phenograph property from fileter markers anndata to full markers anndata
+    adata = copy_property(adata_markers, adata)
+
+    return adata
