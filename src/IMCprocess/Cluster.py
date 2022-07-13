@@ -110,7 +110,7 @@ def main_clustering(adata, markers):
     adata_markers, n_pcs = runPCA(adata_markers)
 
     # 3. run Phenograph
-    adata_markers = run_phenograph(adata_markers)
+    adata_markers = runPhenograph(adata_markers, k=30)
 
     # 4.Computing the neighborhood graph
     sc.pp.neighbors(adata_markers, n_pcs=n_pcs)
