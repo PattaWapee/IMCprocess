@@ -92,10 +92,15 @@ def copy_property(adata1, adata2):
 
 
 def main_clustering(adata, markers):
-    """TODO: Docstring for main_clustering.
-
-    : function: to run phenograph clustering for specific markers selections
-    : returns: anndata object with PhenoGraph_clusters data
+    """
+    function to run phenograph clustering for specific markers selections
+    Parameters:
+    ___________
+    adata: anndata object
+    markers: list of markers for clustering
+    return:
+    _______
+    adata: full markers adata with PhenoGraph_clusters property
 
     """
     # 1. Filter ann data with markers
