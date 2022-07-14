@@ -119,6 +119,9 @@ def main_clustering(adata, markers):
     sc.tl.umap(adata_markers)
 
     # 6. copy phenograph property from fileter markers anndata to full markers anndata
-    adata = copy_property(adata_markers, adata)
+    copy_property(adata_markers, adata)
+
+    # 7. add dendogram
+    sc.tl.dendrogram(adata, groupby='PhenoGraph_clusters')
 
     return adata
