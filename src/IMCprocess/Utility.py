@@ -1,6 +1,19 @@
 import scanpy as sc
 
 
+def read_pickle_obj(pickle_file):
+    open_file = open(pickle_file, "rb")
+    data = pickle.load(open_file)
+    open_file.close()
+    return(data)
+
+
+def save_pickle_obj(file_name, obj_file):
+    open_file = open(file_name, "wb")
+    pickle.dump(obj_file, open_file)
+    open_file.close()
+
+
 def filter_adata(adata, obs_var, obs_value_ls):
     """
     filter anndata by list of obs value
