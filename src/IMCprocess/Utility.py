@@ -1,4 +1,7 @@
 import scanpy as sc
+import pickle
+from upsetplot import plot
+from upsetplot import UpSet
 
 
 def read_pickle_obj(pickle_file):
@@ -31,6 +34,11 @@ def filter_adata(adata, obs_var, obs_value_ls):
     pass
 
 
+######################
+### PLOT FUNCTIONS ###
+######################
+
+
 def heatmap_dendrogram(adata, groupby, figsize):
     """
     plot heatmap with dendrogram from anndata
@@ -57,3 +65,15 @@ def heatmap_dendrogram(adata, groupby, figsize):
                         show=False,
                         figsize=figsize)
     return fig
+
+
+def plt_upset(binary_df):
+    df = binary_df.astype(bool)
+    df['index'] = df.index
+    df = df.set_index(binary_df.columns.to_list())
+    upset_res = UpSet(df, subset_size='count',
+                      show_counts=True, sort_categories_by=None)
+    plot = UpSet(df, subset_size='count',
+                 show_counts=True, sort_categories_by=None).plot()
+
+    return plot
