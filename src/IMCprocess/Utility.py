@@ -9,6 +9,40 @@ from skimage import io
 from skimage import measure
 
 
+def transfer_obs(adata_with_info, adata_get_info, info_name):
+    """
+    transfer obs level info from adata_with_info to adata_get_info
+    by matching index
+    """
+    info = adata_with_info.obs[info_name]
+    adata_get_info.obs[info_name] = info[info.index.isin(
+        adata_get_info.obs_names)]
+    return adata_get_info
+
+
+def merge_adata_obs(adata1, adata2, obs_ls1, obs_ls2):
+    '''
+    merge two anndata and obs by create new anndata with merge obs columns
+    Parameters:
+    ___________
+    adata1, adata2 = anndata objects for merging
+    obs_ls1 = list of obs variable from adata1
+    obs_ls2 = list of obs variable from adata2
+    return:
+    _______
+    merge_adata with new obs columns as obs1+'_'+obs2
+    '''
+    mergeobs = pd.concat([pd.concat([adata1.obs[obs1].rename(obs1+'_'+obs2),
+                                     adata2.obs[obs2].rename(obs1+'_'+obs2)])
+                          for obs1, obs2 in zip(obs_ls1, obs_ls2)], axis=1)
+    new_adata1 = ad.AnnData(adata1.to_df())
+    new_adata2 = ad.AnnData(adata2.to_df())
+
+    merge_adata = ad.concat([new_adata1, new_adata2])
+    merge_adata.obs = mergeobs
+    return merge_adata
+
+
 def read_pickle_obj(pickle_file):
     open_file = open(pickle_file, "rb")
     data = pickle.load(open_file)
@@ -22,21 +56,21 @@ def save_pickle_obj(file_name, obj_file):
     open_file.close()
 
 
-def filter_adata(adata, obs_var, obs_value_ls):
+def filter_adata_obs(adata, obs_var, obs_value_ls):
     """
     filter anndata by list of obs value
     Parameters:
     ___________
     adata = anndata object
-    k = number of nearest neighbors to use in the first step of graph constructions
-        default setting is 30
+    obs_var = obs variable for filtering
+    obs_value_ls = list of obs variable categories for filtering
     return:
     _______
-    adata with PhenoGraph_clusters data
-
+    filtered adata
 
     """
-    pass
+    adata_filtered = adata[adata.obs[obs_var].isin(obs_value_ls)]
+    return adata_filtered
 
 
 ######################
