@@ -36,7 +36,7 @@ def merge_adata_obs(adata1, adata2, obs_ls1, obs_ls2):
     mergeobs = pd.concat([pd.concat([adata1.obs[obs1].rename(obs1+'_'+obs2),
                                      adata2.obs[obs2].rename(obs1+'_'+obs2)])
                           if obs1 != obs2 else
-                          pd.concat([adata1_obs[obs1], adata2_obs[obs2]])
+                          pd.concat([adata1.obs[obs1], adata2.obs[obs2]])
                           for obs1, obs2 in zip(obs_ls1, obs_ls2)], axis=1)
     # change all columns to categories
     mergeobs[mergeobs.columns] = mergeobs[mergeobs.columns].astype('category')
