@@ -41,9 +41,9 @@ def plt_spatial(adata, obs_col, output_path, name):
     fig2.savefig(output_path+obs_col+'_'+name+'_spatial.png', dpi=300)
 
 
-def run_spatial_nhood(adata, obs_col, output_path, name):
+def run_spatial_nhood(adata, obs_col, radius, output_path, name):
 
-    sq.gr.spatial_neighbors(adata)
+    sq.gr.spatial_neighbors(adata, radius=radius)
     sq.gr.nhood_enrichment(adata, cluster_key=obs_col)
     plt.figure(figsize=(8, 5))
 
