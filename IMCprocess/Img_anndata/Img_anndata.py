@@ -2,8 +2,8 @@ import anndata as ad
 import scanpy as sc
 import numpy as np
 import pandas as pd
-import clustifier as cl
-import utils as ut
+import IMCprocess.clustifier as cl
+import IMCprocess.utils as ut
 
 class Img_anndata:
     def __init__(self, dfs, img_ids):
