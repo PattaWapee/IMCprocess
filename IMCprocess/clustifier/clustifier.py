@@ -24,7 +24,7 @@ def plot_cumulative_var(adata, cml_var_explained):
     plt.xlabel('Number of principle components')
     plt.ylabel('Cumulative explained variance')
     # plt.title('Cumulative explained variance')
-    plt.show()
+    #plt.show()
     return(fig)
 
 
@@ -36,8 +36,11 @@ def runPCA(adata):
     # set the minimum cumulative fraction of variance explained
     min_cml_frac = 0.8
     # find the number of PCs that together explain the minimal cum. fraction of variance
-    n_pcs = next(idx for idx, cml_frac in enumerate(
-        cml_var_explained) if cml_frac > min_cml_frac)
+    try:
+        n_pcs = next(idx for idx, cml_frac in enumerate(
+            cml_var_explained) if cml_frac > min_cml_frac)
+    except StopIteration:
+        n_pcs = len(cml_var_explained)
     return adata, n_pcs
 
 
