@@ -31,5 +31,23 @@ class TestClustifier(unittest.TestCase):
         fig = cl.plot_cumulative_var(adata, cml_var_explained)
         self.assertIsInstance(fig, type(plt.figure()))
 
+    def test_runPCA(self):
+        # Check if it returns anndata object with pca data
+        adata = self.create_random_anndata()
+        adata, n_pcs = cl.runPCA(adata)
+        self.assertTrue('pca' in adata.uns.keys())
+        self.assertIsInstance(n_pcs, int)
+        self.assertIsInstance(adata, ad.AnnData)
+        self.assertLessEqual(n_pcs, len(adata.var_names))
+        self.assertTrue('X_pca' in adata.obsm)
+
+    def test_runPhenograph(self):
+        # Check if it returns anndata object with PhenoGraph_clusters data
+        adata = self.create_random_anndata()
+        adata, n_pcs = cl.runPCA(adata)
+        adata = cl.runPhenograph(adata, k=30)
+        self.assertIn('PhenoGraph_clusters', adata.obs.keys())
+        self.assertIsInstance(adata, ad.AnnData)
+
 if __name__ == '__main__':
     unittest.main()
