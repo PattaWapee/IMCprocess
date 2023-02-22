@@ -2,8 +2,8 @@ import anndata as ad
 import scanpy as sc
 import numpy as np
 import pandas as pd
-import IMCprocess.clustifier as cl
-import IMCprocess.utils as ut
+from IMCprocess.clustifier import clustifier as cl
+from IMCprocess.utils import utils as ut
 
 class Img_anndata():
     def __init__(self, dfs, img_ids):
@@ -56,27 +56,27 @@ class Img_anndata():
     ##### Clustering ######
     #######################
 
-def cluster_phenograph(img_anndata, adata_input, markers, name_level):
-    """
-    Description
-    -----------
+    def cluster_phenograph(self, adata_input, markers, name_level):
+        """
+        Description
+        -----------
         Cluster cells using phenograph algorithm
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    Returns
-    -------
-    """
-    adata = adata_input.copy()
-    cl.main_clustering(adata, markers)
-    add_adata_dict(img_anndata, adata, name_level)
+       Returns
+        -------
+        """
+        adata = adata_input.copy()
+        cl.main_clustering(adata, markers)
+        self.add_adata_dict(adata, name_level)
         
 
-def add_adata_dict(img_anndata, adata_new, name_adata):
-    img_anndata.adata_dict[name_adata] = adata_new
+    def add_adata_dict(self, adata_new, name_adata):
+        self.adata_dict[name_adata] = adata_new
 
-def annotate_cluster(img_anndata, name_level, annote_cluster_dict):
-    map_cluster_dict = ut.get_map_dict(annote_cluster_dict)
-    img_anndata.adata_dict[name_level].obs[name_level+'_annotated'] = (img_anndata.adata_dict[
-        name_level].obs['PhenoGraph_clusters'].map(
-            map_cluster_dict).astype('category'))
+    def annotate_cluster(self, name_level, annote_cluster_dict):
+        map_cluster_dict = ut.get_map_dict(annote_cluster_dict)
+        self.adata_dict[name_level].obs[name_level+'_annotated'] = (img_anndata.adata_dict[
+            name_level].obs['PhenoGraph_clusters'].map(
+                map_cluster_dict).astype('category'))

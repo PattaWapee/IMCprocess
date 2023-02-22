@@ -83,14 +83,16 @@ def filter_adata_obs(adata, obs_var, obs_value_ls):
 ### PLOT FUNCTIONS ###
 ######################
 
-
-def heatmap_dendrogram(adata, groupby, figsize):
+def heatmap_dendrogram(adata, groupby, figsize, markers = 'all'):
     """
     plot heatmap with dendrogram from anndata
     Parameters:
     ___________
     adata = anndata object
-    groupby = The obs group label for plotting in heatmap ex. 'PhenoGraph_clusters' (colname from anndata.obs)
+    groupby = The obs group label for plotting in heatmap 
+            ex. 'PhenoGraph_clusters' (colname from anndata.obs)
+    figsize = tuple of figure size
+    markers = marker list to plot in heatmap (default = 'all')
     return:
     _______
     list of Axes
@@ -100,7 +102,8 @@ def heatmap_dendrogram(adata, groupby, figsize):
     >> plot['heatmap_ax'].figure.savefig('output_plot/Fib_level2_AB.png', dpi = 300)
 
     """
-
+    if markers != 'all':
+        adata = adata[:, markers]
     fig = sc.pl.heatmap(adata,
                         adata.var_names,
                         groupby=groupby,
@@ -109,6 +112,17 @@ def heatmap_dendrogram(adata, groupby, figsize):
                         dendrogram=True,
                         show=False,
                         figsize=figsize)
+    return fig
+
+def plt_umap(adata, groupby):
+    fig = sc.pl.umap(adata,
+                     color=[groupby],
+                     add_outline=True,
+                     legend_loc='on data',
+                     legend_fontsize=8,
+                     palette='tab20',
+                     frameon=True,
+                     show=False)
     return fig
 
 

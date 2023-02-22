@@ -1,1 +1,1 @@
-from IMCprocess import clustifier, utils
+from IMCprocess import clustifier
