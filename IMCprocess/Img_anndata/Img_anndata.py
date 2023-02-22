@@ -5,7 +5,7 @@ import pandas as pd
 import IMCprocess.clustifier as cl
 import IMCprocess.utils as ut
 
-class Img_anndata:
+class Img_anndata():
     def __init__(self, dfs, img_ids):
         self.dfs = dfs
         self.img_ids = img_ids
