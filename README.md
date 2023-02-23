@@ -1,2 +1,2 @@
 # IMCprocess
-Python script for downstream analysis of Imaging Mass Cytometry files
+Python package for downstream analysis of Imaging Mass Cytometry files
