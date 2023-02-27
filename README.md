@@ -23,6 +23,7 @@ This will start a new Docker container and mount the /path/to/analysis_dir direc
 ```python
 import sys
 sys.path.append('/app')
+```
 
 ### Note
 * All notebooks created inside the container will be saved to the directory specified in the docker run command. To make sure your notebooks are saved on your local machine, be sure to specify a path that is accessible from within the container.
