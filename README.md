@@ -9,9 +9,11 @@ Python package for downstream analysis of Imaging Mass Cytometry files
 2. Build the Docker image using the following command:
 ```bash
 docker build -t imcprocess-jupyter .
+```
 3. Once the image is built, start a new Docker container using the following command:
 ```bash
 docker run -p 8888:8888 -v /path/to/analysis_dir:/app/analysis_dir -it imcprocess-jupyter
+```
 Replace /path/to/analysis_dir with the path to the directory on your local machine where you want to store your Jupyter notebooks.
 This will start a new Docker container and mount the /path/to/analysis_dir directory on your local machine to the /app/analysis_dir directory inside the container. The -p option maps port 8888 inside the container to port 8888 on your local machine, allowing you to access the Jupyter Notebook server from your web browser.
 4. In a web browser on your local machine, navigate to the following URL to access the Jupyter Notebook interface:
