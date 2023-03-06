@@ -38,9 +38,11 @@ class Img_anndata():
         adata_ls = []
         for df, img_id in zip(self.dfs, self.img_ids):
             if sum(df.columns.isin(['X_position', 'Y_position'])) == 2:
+                columns_to_drop = list(set(
+                    ['Image_id','Mask_id','X_position','Y_position']
+                    ).intersection(set(df.columns)))
                 df_sc = df.dropna(axis= 'columns').drop(
-                    ['Image_id','Mask_id','X_position','Y_position'],
-                    axis = 1, errors='ignore')
+                    columns_to_drop,axis = 1, errors='ignore')
             ada = sc.AnnData(df_sc)
             ada.var_names = df_sc.columns
             ada.obs['img_id'] = [img_id] * len(df)
