@@ -43,7 +43,7 @@ class Img_anndata():
                     ).intersection(set(df.columns)))
                 df_sc = df.dropna(axis= 'columns').drop(
                     columns_to_drop,axis = 1, errors='ignore')
-            ada = sc.AnnData(df_sc)
+            ada = sc.AnnData(df_sc.values, dtype=df_sc.values.dtype)
             ada.var_names = df_sc.columns
             ada.obs['img_id'] = [img_id] * len(df)
             if sum(df.columns.isin(['X_position', 'Y_position'])) == 2:
