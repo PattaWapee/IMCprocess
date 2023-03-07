@@ -43,7 +43,7 @@ def plt_spatial(adata, obs_col, output_path, name):
 
 def run_spatial_nhood(adata, obs_col, radius):
 
-    sq.gr.spatial_neighbors(adata, radius=radius)
+    sq.gr.spatial_neighbors(adata, radius=radius,coord_type='generic')
     sq.gr.nhood_enrichment(adata, cluster_key=obs_col)
 
 def plt_spatial_nhood(adata, obs_col, output_path, name, img_size=(8, 5)):
