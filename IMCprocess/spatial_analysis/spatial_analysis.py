@@ -42,6 +42,11 @@ def plt_spatial(adata, obs_col, output_path, name):
 
 
 def run_spatial_nhood(adata, obs_col, radius):
+     # add None to obs_col if there is nan in obs_col
+    adata.obs[obs_col] = pd.Categorical(adata.obs[obs_col])
+    if adata.obs[obs_col].isna().any():
+        adata.obs[obs_col] = adata.obs[obs_col].cat.add_categories(['None'])
+        adata.obs[obs_col].fillna('None', inplace=True)
 
     sq.gr.spatial_neighbors(adata, radius=radius,coord_type='generic')
     sq.gr.nhood_enrichment(adata, cluster_key=obs_col)
