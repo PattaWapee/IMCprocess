@@ -1,10 +1,18 @@
 from cellpose import io
+import cv2
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from skimage.measure import label, regionprops
 from skimage import segmentation, color
+import matplotlib.image as mpimg
 
 
 
-def plt_outline(mask, color=(1, 0, 0), mode='inner', overlay=None):
+def plt_outline(mask, line_color=(1, 0, 0), 
+                mode='inner', overlay=None,
+                output_file=None
+                ):
     """
     Plot the outline of a mask on a black background (overlay=None) 
     or on a specific background (overlay=tiff_filename).
@@ -12,7 +20,7 @@ def plt_outline(mask, color=(1, 0, 0), mode='inner', overlay=None):
     Parameters:
     ___________
     mask: numpy ndarray of the mask 
-    color: tuple of the color of the outline
+    line_color: tuple of the color of the outline
     mode: mode parameter in segmentation.mark_boundaries
     overlay: tiff file to overlay the mask on (optional)
     return:
@@ -22,7 +30,111 @@ def plt_outline(mask, color=(1, 0, 0), mode='inner', overlay=None):
     """
     outline_image = segmentation.mark_boundaries(color.gray2rgb(mask), 
                                                  mask, 
-                                                 color=color, 
+                                                 color=line_color, 
                                                  mode=mode)
-    io.show(outline_image)
+    plt.imshow(outline_image)
+    # Convert the depth of the image to uint8
+    outline_image_uint8 = np.array(outline_image * 255, dtype=np.uint8)
+
+    if output_file is not None:
+        # Save the outline image to a file
+        mpimg.imsave(output_file, outline_image_uint8)
     return outline_image
+
+def plt_outline_label(mask, region_props,
+                      labeled_cells, 
+                      line_color=(1, 0, 0), 
+                      mode='inner',
+                      output_file=None):
+    """
+    Plot the mask on a black background with the label of each region
+
+    Parameters:
+    ___________
+    mask: numpy ndarray of the mask 
+    region_props: region_probs from skimage.measure.regionprops
+    return:
+    _______
+    mask_image: numpy ndarray of the mask image with labels
+    
+    """
+    # Generate an outline image using the labeled mask
+    outline_image = segmentation.mark_boundaries(
+        color.gray2rgb(mask), 
+        labeled_cells, 
+        color=line_color,
+        mode=mode)
+
+    # Iterate over each labeled region and draw the label number on the outline image
+    for region in region_props:
+        # Compute the centroid of the region
+        cy, cx = region.centroid
+
+        # Draw the label number on the outline image
+        cv2.putText(outline_image, str(region.label), (int(cx), int(cy)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 1), 2)
+
+    plt.imshow(outline_image)
+    plt.axis('off')
+    plt.show()
+    # Convert the depth of the image to uint8
+    outline_image_uint8 = np.array(outline_image * 255, dtype=np.uint8)
+
+    if output_file is not None:
+        # Save the outline image to a file
+        mpimg.imsave(output_file, outline_image_uint8)
+    return outline_image
+
+
+def table_region(region_props):
+    """
+    Create a table of the region properties of the mask.
+    Parameters:
+    ___________
+    region_props: region_probs from skimage.measure.regionprops 
+    return:
+    _______
+    table: pandas dataframe of the region properties
+    """ 
+    labels = [reg.label for reg in region_props]
+    areas = [reg.area for reg in region_props]
+    centx = [reg.centroid[0] for reg in region_props]
+    centy = [reg.centroid[1] for reg in region_props]
+
+    reg_table = pd.DataFrame({'label': labels,
+                          'area': areas,
+                          'centroid_x': centx,
+                          'centroid_y': centy})
+    return reg_table
+
+
+def cell_in_region(cell_regprops, mask_regprops):
+    '''
+    Check if the centroid of the cell is inside the bounding box of an item in region from mask.
+    Parameters:
+    ___________
+    cell_regprops: cell region_probs from skimage.measure.regionprops 
+    mask_regprops: other type (such as cancer) region_probs from skimage.measure.regionprops 
+    return:
+    _______
+    cell_in_cancer: dictionary of the list of cell labels inside the mask regions
+    '''
+
+    cell_in_region = {}
+    cell_outside_region = []
+
+    for i, cell_i in enumerate(cell_regprops):
+        #print(f"Checking cell {i+1}...")
+        celli_centroid = cell_i.centroid
+        for j, region_j in enumerate(mask_regprops):
+            cell_in_region.setdefault(region_j.label, [])
+            if region_j.bbox[0] <= celli_centroid[0] <= region_j.bbox[2] and region_j.bbox[1] <= celli_centroid[1] <= region_j.bbox[3]:
+                #print(f"Cell {i+1} is located inside an item in cancer region {j+1}.")
+                cell_in_region[region_j.label].append(cell_i.label)
+                break
+
+        #The else block will be executed if the loop completes without encountering a break statement, 
+        # indicating that the cell is not located inside any of the cancer regions.
+        else:
+            cell_outside_region.append(cell_i.label)
+            #print(f"Cell {i+1} is located outside all items in cancer region.")
+    return cell_in_region, cell_outside_region
