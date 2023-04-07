@@ -7,6 +7,24 @@ from skimage.measure import label, regionprops
 from skimage import segmentation, color
 import matplotlib.image as mpimg
 
+'''
+class Mask:
+    def __init__(self, mask, img_id, mask_type, img_size):
+        self.mask = mask
+        self.img_id = img_id
+        self.mask_id = mask_type
+        self.img_size = img_size
+        self.mask_df = self.create_mask_df()
+
+    def create_mask_df(self):
+        """
+        Create a pandas dataframe from the mask
+        """
+        mask_labeled = label(self.mask)
+        mask_regprops = regionprops(mask_labeled)
+        mask_df = table_region(mask_regprops)
+        return mask_df
+'''
 
 
 def plt_outline(mask, line_color=(1, 0, 0), 
@@ -120,13 +138,15 @@ def cell_in_region(cell_regprops, mask_regprops):
     '''
 
     cell_in_region = {}
+    [cell_in_region.setdefault(region_j.label, []) for region_j in mask_regprops]
     cell_outside_region = []
 
     for i, cell_i in enumerate(cell_regprops):
         #print(f"Checking cell {i+1}...")
         celli_centroid = cell_i.centroid
         for j, region_j in enumerate(mask_regprops):
-            cell_in_region.setdefault(region_j.label, [])
+            #print(f'Checking cell {i+1} against region {j+1}...')
+            #cell_in_region.setdefault(region_j.label, [])
             if region_j.bbox[0] <= celli_centroid[0] <= region_j.bbox[2] and region_j.bbox[1] <= celli_centroid[1] <= region_j.bbox[3]:
                 #print(f"Cell {i+1} is located inside an item in cancer region {j+1}.")
                 cell_in_region[region_j.label].append(cell_i.label)
