@@ -1,4 +1,4 @@
-from cellpose import io
+#from cellpose import io
 import cv2
 import pandas as pd
 import numpy as np
@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from skimage.measure import label, regionprops
 from skimage import segmentation, color
 import matplotlib.image as mpimg
+from skimage.transform import resize
+from skimage import io
 
 '''
 class Mask:
@@ -27,7 +29,7 @@ class Mask:
 '''
 
 
-def plt_outline(mask, line_color=(1, 0, 0), 
+def plt_outline(mask, line_color=(1, 0, 0),
                 mode='inner', overlay=None,
                 output_file=None
                 ):
@@ -44,12 +46,21 @@ def plt_outline(mask, line_color=(1, 0, 0),
     return:
     _______
     outline_image: numpy ndarray of the outline image
-    
+
     """
-    outline_image = segmentation.mark_boundaries(color.gray2rgb(mask), 
-                                                 mask, 
-                                                 color=line_color, 
+    outline_image = segmentation.mark_boundaries(color.gray2rgb(mask),
+                                                 mask,
+                                                 color=line_color,
                                                  mode=mode)
+    if overlay is not None:
+        # Resize the overlay image to match the size of the outline image
+        overlay_image_resized = resize(overlay, mask.shape, anti_aliasing=True)
+        # Convert the grayscale overlay image to RGB
+        overlay_image_resized = color.gray2rgb(overlay_image_resized)
+        # Blend the overlay image and the outline image
+        alpha = 0.5  # Set the blending ratio
+        outline_image = alpha * outline_image + (1 - alpha) * overlay_image_resized
+
     plt.imshow(outline_image)
     # Convert the depth of the image to uint8
     outline_image_uint8 = np.array(outline_image * 255, dtype=np.uint8)
@@ -59,9 +70,10 @@ def plt_outline(mask, line_color=(1, 0, 0),
         mpimg.imsave(output_file, outline_image_uint8)
     return outline_image
 
+
 def plt_outline_label(mask, region_props,
-                      labeled_cells, 
-                      line_color=(1, 0, 0), 
+                      labeled_cells,
+                      line_color=(1, 0, 0),
                       mode='inner',
                       output_file=None):
     """
@@ -74,12 +86,12 @@ def plt_outline_label(mask, region_props,
     return:
     _______
     mask_image: numpy ndarray of the mask image with labels
-    
+
     """
     # Generate an outline image using the labeled mask
     outline_image = segmentation.mark_boundaries(
-        color.gray2rgb(mask), 
-        labeled_cells, 
+        color.gray2rgb(mask),
+        labeled_cells,
         color=line_color,
         mode=mode)
 
@@ -89,7 +101,8 @@ def plt_outline_label(mask, region_props,
         cy, cx = region.centroid
 
         # Draw the label number on the outline image
-        cv2.putText(outline_image, str(region.label), (int(cx), int(cy)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 1), 2)
+        cv2.putText(outline_image, str(region.label), (int(cx), int(
+            cy)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 1), 2)
 
     plt.imshow(outline_image)
     plt.axis('off')
@@ -112,16 +125,16 @@ def table_region(region_props):
     return:
     _______
     table: pandas dataframe of the region properties
-    """ 
+    """
     labels = [reg.label for reg in region_props]
     areas = [reg.area for reg in region_props]
     centx = [reg.centroid[0] for reg in region_props]
     centy = [reg.centroid[1] for reg in region_props]
 
     reg_table = pd.DataFrame({'label': labels,
-                          'area': areas,
-                          'centroid_x': centx,
-                          'centroid_y': centy})
+                              'area': areas,
+                              'centroid_x': centx,
+                              'centroid_y': centy})
     return reg_table
 
 
@@ -138,7 +151,8 @@ def cell_in_region(cell_regprops, mask_regprops):
     '''
 
     cell_in_region = {}
-    [cell_in_region.setdefault(region_j.label, []) for region_j in mask_regprops]
+    [cell_in_region.setdefault(region_j.label, [])
+     for region_j in mask_regprops]
     cell_outside_region = []
 
     for i, cell_i in enumerate(cell_regprops):
@@ -152,9 +166,10 @@ def cell_in_region(cell_regprops, mask_regprops):
                 cell_in_region[region_j.label].append(cell_i.label)
                 break
 
-        #The else block will be executed if the loop completes without encountering a break statement, 
+        # The else block will be executed if the loop completes without encountering a break statement,
         # indicating that the cell is not located inside any of the cancer regions.
         else:
             cell_outside_region.append(cell_i.label)
             #print(f"Cell {i+1} is located outside all items in cancer region.")
     return cell_in_region, cell_outside_region
+
