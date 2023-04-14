@@ -128,8 +128,8 @@ def table_region(region_props):
     """
     labels = [reg.label for reg in region_props]
     areas = [reg.area for reg in region_props]
-    centx = [reg.centroid[0] for reg in region_props]
-    centy = [reg.centroid[1] for reg in region_props]
+    centx = [reg.centroid[1] for reg in region_props]
+    centy = [reg.centroid[0] for reg in region_props]
 
     reg_table = pd.DataFrame({'label': labels,
                               'area': areas,
