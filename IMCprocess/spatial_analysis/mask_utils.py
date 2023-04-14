@@ -173,3 +173,39 @@ def cell_in_region(cell_regprops, mask_regprops):
             #print(f"Cell {i+1} is located outside all items in cancer region.")
     return cell_in_region, cell_outside_region
 
+
+#################################################
+# These function below is for the analysis of ###
+# the cell type in the stroma or cancer regions #
+#################################################
+
+
+def get_celltype_fraction(obs_object, col_label, cell_in_reg_df, col_cell_type):
+    obs_df = obs_object.copy()
+    cellid = cell_in_reg_df.loc[0, col_cell_type]
+    if isinstance(cellid, dict):
+        cellid_list = []  # The target list to merge all the values into
+
+        # Iterate through the values of the dictionary
+        for lst in cellid.values():
+            cellid_list.extend(lst)
+    else:
+        cellid_list = cellid
+
+    # add label column to obs for mapping with cell_data
+    obs_df['label'] = np.array(range(1, len(obs_df)+1))
+    #How many cells for each cell types in stroma?
+    obs_df[obs_df['label'].isin(cellid_list)][col_label].value_counts()
+
+    fraction_df = pd.DataFrame(obs_df[obs_df.label.isin(
+        cellid_list)][col_label].value_counts(
+            normalize=True)).rename(columns={col_label:'fraction_'+ col_cell_type})
+    return fraction_df
+
+def plt_fraction_df(fraction_df, output_file):
+    fraction_df.plot(kind='bar')
+    # Add labels to the bars
+    for i in range(len(fraction_df)):
+        label = round(fraction_df.iloc[:,0][i], 2)  # Round value to one decimal place
+        plt.text(i, fraction_df.iloc[:,0][i] + 0.01, label, ha='center')
+    plt.savefig(output_file, dpi=300, bbox_inches='tight')
