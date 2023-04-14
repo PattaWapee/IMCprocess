@@ -1,1 +1,1 @@
-from IMCprocess import clustifier, spatial_analysis, utils, img_anndata
+from IMCprocess import clustifier, spatial_analysis, utils, Img_anndata
