@@ -9,6 +9,7 @@ import matplotlib.image as mpimg
 from skimage.transform import resize
 from skimage import io
 
+
 '''
 class Mask:
     def __init__(self, mask, img_id, mask_type, img_size):
