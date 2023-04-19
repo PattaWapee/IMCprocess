@@ -35,6 +35,27 @@ class Mask:
         return mask_df
 
 
+class Img_mask:
+    def __init__(self, Img_anndata):
+        self.img_mask_adata = Img_anndata
+        self.cancer_mask = None
+        self.tissue_mask = None
+        
+    
+    def display(self):
+        io.imshow(self.pixels)
+        io.show()
+
+    def analyze_cancer_mask(self):
+        # Analyze cancer mask and return statistics
+        # ...
+        pass
+
+    def analyze_tissue_mask(self):
+        # Analyze tissue mask and return statistics
+        # ...
+        pass
+
 
 def plt_outline(mask, line_color=(1, 0, 0),
                 mode='inner', overlay=None,
