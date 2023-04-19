@@ -10,24 +10,30 @@ from skimage.transform import resize
 from skimage import io
 
 
-'''
+
 class Mask:
-    def __init__(self, mask, img_id, mask_type, img_size):
-        self.mask = mask
+    def __init__(self, mask_file, img_id, mask_type):
+        '''
+        
+        '''
+        self.filename = mask_file
+        self.load_mask()
         self.img_id = img_id
         self.mask_id = mask_type
-        self.img_size = img_size
         self.mask_df = self.create_mask_df()
+
+    def load_mask(self):
+        self.pixels = io.imread(self.filename)
 
     def create_mask_df(self):
         """
         Create a pandas dataframe from the mask
         """
-        mask_labeled = label(self.mask)
+        mask_labeled = label(self.pixels)
         mask_regprops = regionprops(mask_labeled)
         mask_df = table_region(mask_regprops)
         return mask_df
-'''
+
 
 
 def plt_outline(mask, line_color=(1, 0, 0),
