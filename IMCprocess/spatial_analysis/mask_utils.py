@@ -49,9 +49,9 @@ class Mask:
         """
         Create a pandas dataframe from the mask
         """
-        mask_labeled = label(self.pixels)
-        mask_regprops = regionprops(mask_labeled)
-        mask_df = table_region(mask_regprops)
+        self.mask_labeled = label(self.pixels)
+        self.mask_regprops = regionprops(self.mask_labeled)
+        mask_df = table_region(self.mask_regprops)
         return mask_df
 
 
@@ -239,6 +239,17 @@ def cell_in_region(cell_regprops, mask_regprops):
             cell_outside_region.append(cell_i.label)
             #print(f"Cell {i+1} is located outside all items in cancer region.")
     return cell_in_region, cell_outside_region
+
+def create_cell_in_region_table(Cell_mask, Region_mask):
+    cells_in_Reg, cells_outside_Reg = cell_in_region(Cell_mask.mask_regprops, 
+                                                        Region_mask.mask_regprops)
+    # add number of cells in each region to the table
+    cell_in_reg_tb =Region_mask.mask_df.copy()
+    cell_in_reg_tb['num_cells'] = cell_in_reg_tb['label'].map(lambda x: len(cell_in_reg_tb[x]))
+    cell_in_reg_tb['cells_in_region'] = cell_in_reg_tb['label'].map(
+        lambda x: cell_in_reg_tb[x])
+    return cell_in_reg_tb
+    
 
 
 #################################################
