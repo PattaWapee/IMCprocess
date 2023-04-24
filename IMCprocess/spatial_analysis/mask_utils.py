@@ -14,6 +14,26 @@ from skimage import io
 class Mask:
     def __init__(self, mask_file, img_id, mask_type):
         '''
+        Class Name: Mask
+
+        Description: This class represents a mask of an image. 
+        It contains methods to load a mask, create a pandas dataframe from the mask
+
+        Attributes:
+
+        filename: A string representing the file name of the mask.
+        img_id: A string representing the image ID of the mask.
+        mask_type: A string representing the mask type (cancer_mask, tissue_mask, cell_mask).
+        mask_df: A pandas dataframe representing the mask.
+        Methods:
+
+        init(self, mask_file, img_id, mask_type): 
+            Constructor method that initializes the class attributes and loads the mask.
+        load_mask(self): Method that loads the mask using skimage's io.imread method 
+            and stores it in the pixels attribute.
+        create_mask_df(self): Method that creates a pandas dataframe 
+            from the mask using skimage's label and regionprops methods and 
+            stores it in the mask_df attribute.
         
         '''
         self.filename = mask_file
@@ -36,15 +56,34 @@ class Mask:
 
 
 class Img_mask:
-    def __init__(self, Img_anndata):
+    def __init__(self, Img_anndata, cell_mask=None, cancer_mask=None, tissue_mask=None):
+        """
+        Parameters:
+        ___________
+        cell_mask: a Mask object representing the cell mask
+        cancer_mask: a Mask object representing the cancer mask
+        tissue_mask: a Mask object representing the tissue mask
+        """
         self.img_mask_adata = Img_anndata
-        self.cancer_mask = None
-        self.tissue_mask = None
+        self.cell_mask = cell_mask
+        self.cancer_mask = cancer_mask
+        self.tissue_mask = tissue_mask
         
     
-    def display(self):
-        io.imshow(self.pixels)
-        io.show()
+    def plot_outline_mask(self, masktype, output_file=None, overlay=None):
+        if masktype == 'cancer':
+            mask_outline = plt_outline(self.cancer_mask.pixels, line_color=(1, 0, 0), 
+                                       mode='inner', overlay=overlay, 
+                                       output_file=output_file)
+        elif masktype == 'tissue':
+            mask_outline = plt_outline(self.cancer_mask.pixels, line_color=(1, 0, 0), 
+                                       mode='inner', overlay=overlay, 
+                                       output_file=output_file)
+        elif masktype=='cell_mask':
+            mask_outline = plt_outline(self.cell_mask.pixels, line_color=(1, 0, 0), 
+                                       mode='inner', overlay=overlay, 
+                                       output_file=output_file)
+    
 
     def analyze_cancer_mask(self):
         # Analyze cancer mask and return statistics
