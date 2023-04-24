@@ -76,7 +76,7 @@ class Img_mask:
                                        mode='inner', overlay=overlay, 
                                        output_file=output_file)
         elif masktype == 'tissue':
-            mask_outline = plt_outline(self.cancer_mask.pixels, line_color=(1, 0, 0), 
+            mask_outline = plt_outline(self.tissue_mask.pixels, line_color=(1, 0, 0), 
                                        mode='inner', overlay=overlay, 
                                        output_file=output_file)
         elif masktype=='cell_mask':
