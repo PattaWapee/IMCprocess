@@ -69,6 +69,10 @@ class Img_mask:
         self.cell_mask = cell_mask
         self.cancer_mask = cancer_mask
         self.tissue_mask = tissue_mask
+        self.analyze_cancer_mask()
+        self.analyze_tissue_mask()
+        self.find_stroma_cells()
+        self.create_cells_table()
         
     
     def plot_outline_mask(self, masktype, output_file=None, overlay=None):
@@ -102,10 +106,27 @@ class Img_mask:
             self.cells_in_cancer.values()))
         all_cells_in_tissue = list(itertools.chain.from_iterable(
             self.cells_in_tissue.values()))
-        cells_in_both_cancer_tissue = list(set(all_cells_in_cancer).intersection(
+        self.cells_in_both_cancer_tissue = list(set(all_cells_in_cancer).intersection(
         set(all_cells_in_tissue)))
-        self.cells_in_stroma = list(set(all_cells_in_tissue).difference(cells_in_both_cancer_tissue))
+        self.cells_in_stroma = list(set(all_cells_in_tissue).difference(self.cells_in_both_cancer_tissue))
 
+    def create_cells_table(self):
+        self.cells_list_df = pd.DataFrame({'cells_in_stroma': [self.cells_in_stroma],
+                          'cells_in_cancer': [self.cells_in_cancer],
+                          'cells_in_cancer&tissue': [self.cells_in_both_cancer_tissue],
+                          'num_cells_in_stroma': [len(self.cells_in_stroma)],
+                          'num_cells_in_cancer': [len(self.cells_in_cancer)],
+                          'num_cells_in_cancer&tissue': [len(self.cells_in_both_cancer_tissue)]
+                          })
+        cells_data = self.img_mask_adata.obs.copy().reset_index()
+        cancer_indices = np.array(list(itertools.chain.from_iterable(
+            self.cells_list_df.loc[0,'cells_in_cancer'].values())))-1
+        stroma_indices = np.array(self.cells_list_df.loc[0,'cells_in_stroma'])-1
+        cells_data['location'] = ''
+        cells_data['cell_label'] = np.array(cells_data.index)+1
+        cells_data.loc[cancer_indices,'location'] = 'cancer'
+        cells_data.loc[stroma_indices,'location'] = 'stroma'
+        self.cells_data = cells_data
 
 def plt_outline(mask, line_color=(1, 0, 0),
                 mode='inner', overlay=None,
