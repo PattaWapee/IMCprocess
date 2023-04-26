@@ -8,6 +8,7 @@ from skimage import segmentation, color
 import matplotlib.image as mpimg
 from skimage.transform import resize
 from skimage import io
+import itertools
 
 
 
@@ -86,14 +87,24 @@ class Img_mask:
     
 
     def analyze_cancer_mask(self):
-        # Analyze cancer mask and return statistics
-        # ...
-        pass
+        # Find cell i located in cancer mask and return table
+        self.cells_in_cancer_tb, self.cells_in_cancer = create_cell_in_region_table(
+            self.cell_mask, self.cancer_mask)
 
     def analyze_tissue_mask(self):
-        # Analyze tissue mask and return statistics
-        # ...
-        pass
+        # Find cell i located in tissue mask and return table
+        self.cells_in_tissue_tb, self.cells_in_tissue = create_cell_in_region_table(
+            self.cell_mask, self.tissue_mask)
+
+    def find_stroma_cells(self):
+        # Find cell i located in tissue mask and not in cancer mask and return table
+        all_cells_in_cancer = list(itertools.chain.from_iterable(
+            self.cells_in_cancer.values()))
+        all_cells_in_tissue = list(itertools.chain.from_iterable(
+            self.cells_in_tissue.values()))
+        cells_in_both_cancer_tissue = list(set(all_cells_in_cancer).intersection(
+        set(all_cells_in_tissue)))
+        self.cells_in_stroma = list(set(all_cells_in_tissue).difference(cells_in_both_cancer_tissue))
 
 
 def plt_outline(mask, line_color=(1, 0, 0),
@@ -245,10 +256,10 @@ def create_cell_in_region_table(Cell_mask, Region_mask):
                                                         Region_mask.mask_regprops)
     # add number of cells in each region to the table
     cell_in_reg_tb =Region_mask.mask_df.copy()
-    cell_in_reg_tb['num_cells'] = cell_in_reg_tb['label'].map(lambda x: len(cell_in_reg_tb[x]))
+    cell_in_reg_tb['num_cells'] = cell_in_reg_tb['label'].map(lambda x: len(cells_in_Reg[x]))
     cell_in_reg_tb['cells_in_region'] = cell_in_reg_tb['label'].map(
-        lambda x: cell_in_reg_tb[x])
-    return cell_in_reg_tb
+        lambda x: cells_in_Reg[x])
+    return cell_in_reg_tb, cells_in_Reg
     
 
 
