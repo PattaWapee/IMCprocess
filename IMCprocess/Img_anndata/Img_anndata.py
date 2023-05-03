@@ -77,8 +77,15 @@ class Img_anndata():
     def add_adata_dict(self, adata_new, name_adata):
         self.adata_dict[name_adata] = adata_new
 
-    def annotate_cluster(self, name_level, annote_cluster_dict):
+    def annotate_cluster(self, name_level, annote_cluster_dict, new_name = None):
         map_cluster_dict = ut.get_map_dict(annote_cluster_dict)
-        self.adata_dict[name_level].obs[name_level+'_annotated'] = (self.adata_dict[
-            name_level].obs['PhenoGraph_clusters'].map(
-                map_cluster_dict).astype('category'))
+        if name_level+'_annotated' not in self.adata_dict[name_level].obs.columns:
+            self.adata_dict[name_level].obs[name_level+'_annotated'] = (self.adata_dict[
+                name_level].obs['PhenoGraph_clusters'].map(
+                    map_cluster_dict).astype('category'))
+        else:
+            print('Add new annotation for '+name_level+' as '+new_name)
+            self.adata_dict[name_level].obs[name_level+'_'+ new_name] = (self.adata_dict[
+                name_level].obs['PhenoGraph_clusters'].map(
+                    map_cluster_dict).astype('category'))
+        
