@@ -79,6 +79,6 @@ class Img_anndata():
 
     def annotate_cluster(self, name_level, annote_cluster_dict):
         map_cluster_dict = ut.get_map_dict(annote_cluster_dict)
-        self.adata_dict[name_level].obs[name_level+'_annotated'] = (img_anndata.adata_dict[
+        self.adata_dict[name_level].obs[name_level+'_annotated'] = (self.adata_dict[
             name_level].obs['PhenoGraph_clusters'].map(
                 map_cluster_dict).astype('category'))
