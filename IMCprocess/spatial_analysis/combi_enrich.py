@@ -10,7 +10,7 @@ import random
 import string
 other_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(other_dir_path)
-from IMCprocess.img_anndata.img_anndata import Img_anndata
+from IMCprocess.Img_anndata.Img_anndata import Img_anndata
 import IMCprocess.spatial_analysis.spatial_analysis as sa
 
 ######################################################
