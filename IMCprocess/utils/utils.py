@@ -49,6 +49,18 @@ def merge_adata_obs(adata1, adata2, obs_ls1, obs_ls2):
     return merge_adata
 
 
+def add_level2_to_level1_obs(level1_adata, level2_adata_list):
+    '''
+    Add level2 annotation to level1 adata object
+    '''
+    level1_adata.obs['level2'] = level1_adata.obs['level1_annotated'].astype(str)
+    for lev2_adata in level2_adata_list:
+        lev2_col = lev2_adata.obs.columns[lev2_adata.obs.columns.str.contains('level2')][0]
+        lev2_adata.obs['level2'] = lev2_adata.obs[
+            'level1_annotated'].astype('str') + '_' + lev2_adata.obs[lev2_col].astype('str')
+        level1_adata.obs.loc[lev2_adata.obs.level2.index, 'level2'] = lev2_adata.obs.level2
+    return level1_adata
+
 def read_pickle_obj(pickle_file):
     open_file = open(pickle_file, "rb")
     data = pickle.load(open_file)
@@ -77,6 +89,7 @@ def filter_adata_obs(adata, obs_var, obs_value_ls):
     """
     adata_filtered = adata[adata.obs[obs_var].isin(obs_value_ls)]
     return adata_filtered
+
 
 
 ######################
