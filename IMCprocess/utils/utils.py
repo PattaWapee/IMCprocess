@@ -48,7 +48,6 @@ def merge_adata_obs(adata1, adata2, obs_ls1, obs_ls2):
     merge_adata.obs = mergeobs
     return merge_adata
 
-
 def add_level2_to_level1_obs(level1_adata, level2_adata_list):
     '''
     Add level2 annotation to level1 adata object
@@ -60,6 +59,13 @@ def add_level2_to_level1_obs(level1_adata, level2_adata_list):
             'level1_annotated'].astype('str') + '_' + lev2_adata.obs[lev2_col].astype('str')
         level1_adata.obs.loc[lev2_adata.obs.level2.index, 'level2'] = lev2_adata.obs.level2
     return level1_adata
+
+def get_map_dict(annot_cluster_dict):
+    map_dict = {}
+    for key, value in annot_cluster_dict.items():
+        for i in value:
+            map_dict[i] = key
+    return(map_dict)
 
 def read_pickle_obj(pickle_file):
     open_file = open(pickle_file, "rb")
