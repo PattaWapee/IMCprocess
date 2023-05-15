@@ -50,6 +50,9 @@ def run_spatial_nhood(adata, obs_col, radius):
 
     sq.gr.spatial_neighbors(adata, radius=radius,coord_type='generic')
     sq.gr.nhood_enrichment(adata, cluster_key=obs_col)
+    # calculate pvalue from zscore and save to uns
+    adata.uns[obs_col+'_nhood_enrichment']['pval'] = z_to_pvalue(
+        adata.uns[obs_col+'_nhood_enrichment']['zscore'])
 
 def plt_spatial_nhood(adata, obs_col, output_path, name, img_size=(8, 5)):
     plt.figure(figsize=img_size)
@@ -71,21 +74,8 @@ def plt_interaction_mat(adata, obs_col, output_path, name):
                              dpi=300)
 
 
-def run_pair_spaital(adata1, adata2, 
-                     merge_obs1, merge_obs2, 
-                     merge_obs_name):
-    """
-    Description
-    -----------
-    run pair spatial analysis
-    Parameters
-    ----------
-    adata1 : first anndata for spatial analysis
-    adata2 : second anndata for spatial analysis
-    merge_obs1 : obs column name for adata1
-    merge_obs2 : obs column name for adata2
-    merge_obs_name : obs column name for merged adata
-    Returns
-    -------
-    """
-    # 1.  and adata2
+import scipy.stats
+def z_to_pvalue(z_array):
+    df = pd.DataFrame(z_array)
+    pval = scipy.stats.norm.sf(abs(df))
+    return(pval)
