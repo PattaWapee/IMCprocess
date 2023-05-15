@@ -69,3 +69,23 @@ def plt_interaction_mat(adata, obs_col, output_path, name):
                              save=output_path + obs_col + '_' +
                              name + '_interaction_mat.png',
                              dpi=300)
+
+
+def run_pair_spaital(adata1, adata2, 
+                     merge_obs1, merge_obs2, 
+                     merge_obs_name):
+    """
+    Description
+    -----------
+    run pair spatial analysis
+    Parameters
+    ----------
+    adata1 : first anndata for spatial analysis
+    adata2 : second anndata for spatial analysis
+    merge_obs1 : obs column name for adata1
+    merge_obs2 : obs column name for adata2
+    merge_obs_name : obs column name for merged adata
+    Returns
+    -------
+    """
+    # 1.  and adata2
