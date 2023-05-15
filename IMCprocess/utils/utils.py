@@ -59,7 +59,6 @@ def merge_adata_obs(adata, obs_ls1, *args):
     _______
     merge_adata with new obs columns as obs_ls1[0]+'_'+obs_ls1[1]
     '''
-    pass
     
 
 def add_level2_to_level1_obs(level1_adata, level2_adata_list):
