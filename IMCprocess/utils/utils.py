@@ -10,6 +10,32 @@ from skimage import io
 from skimage import measure
 
 
+def merge_adata(adata1, adata2, merge_obs1= None, merge_obs2= None, merge_obs_name= None):
+    """
+    Description
+    -----------
+    merge two adata
+    obs will be merged with the same column name and 
+    if you want to merge obs col with different name you can use merge_obs_name
+    Parameters
+    ----------
+    adata1 : first anndata for merge
+    adata2 : second anndata for merge
+    merge_obs1 : obs column name for adata1 to be merged
+    merge_obs2 : obs column name for adata2 to be merged
+    merge_obs_name : obs column name for merged adata
+    Returns
+    -------
+    
+    """
+    if (merge_obs_name is None) and (merge_obs1 is None) and (merge_obs2 is None):
+        return ad.concat([adata1,adata2])
+    else:
+        adata1.obs[merge_obs_name] = adata1.obs[merge_obs1].astype('category')
+        adata2.obs[merge_obs_name] = adata2.obs[merge_obs2].astype('category')
+        adata = ad.concat([adata1,adata2])
+        return adata
+
 def transfer_obs(adata_with_info, adata_get_info, info_name):
     """
     transfer obs level info from adata_with_info to adata_get_info
