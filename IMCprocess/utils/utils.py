@@ -47,32 +47,20 @@ def transfer_obs(adata_with_info, adata_get_info, info_name):
     return adata_get_info
 
 
-def merge_adata_obs(adata1, adata2, obs_ls1, obs_ls2):
+def merge_adata_obs(adata, obs_ls1, *args):
     '''
-    merge two anndata and obs by create new anndata with merge obs columns
+    merge pair of obs column in anndata
     Parameters:
     ___________
     adata1, adata2 = anndata objects for merging
-    obs_ls1 = list of obs variable from adata1
-    obs_ls2 = list of obs variable from adata2
+    obs_ls1 = list of obs variable from adata to be merge
+    *args = additional list of obs variable from adata to be merge
     return:
     _______
-    merge_adata with new obs columns as obs1+'_'+obs2
+    merge_adata with new obs columns as obs_ls1[0]+'_'+obs_ls1[1]
     '''
-    mergeobs = pd.concat([pd.concat([adata1.obs[obs1].rename(obs1+'_'+obs2),
-                                     adata2.obs[obs2].rename(obs1+'_'+obs2)])
-                          if obs1 != obs2 else
-                          pd.concat([adata1.obs[obs1], adata2.obs[obs2]])
-                          for obs1, obs2 in zip(obs_ls1, obs_ls2)], axis=1)
-    # change all columns to categories
-    mergeobs[mergeobs.columns] = mergeobs[mergeobs.columns].astype('category')
-
-    new_adata1 = ad.AnnData(adata1.to_df())
-    new_adata2 = ad.AnnData(adata2.to_df())
-
-    merge_adata = ad.concat([new_adata1, new_adata2])
-    merge_adata.obs = mergeobs
-    return merge_adata
+    pass
+    
 
 def add_level2_to_level1_obs(level1_adata, level2_adata_list):
     '''
