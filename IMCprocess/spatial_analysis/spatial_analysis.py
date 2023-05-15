@@ -63,6 +63,14 @@ def plt_spatial_nhood(adata, obs_col, output_path, name, img_size=(8, 5)):
                            dpi=300
                            )
 
+def plt_spatial_pval(adata, obs_col, output_path, name, img_size=(8, 5)):
+    plt.figure(figsize=img_size)
+    sq.pl.nhood_enrichment(adata, 
+                           cluster_key = obs_col, 
+                           mode='pval', annotate=True,
+                           save=output_path + obs_col + '_' + name + '_nh_enrich_pval.png',
+                           title=[name+' p-value '+obs_col],
+                           dpi=300)
 
 def plt_interaction_mat(adata, obs_col, output_path, name):
 
