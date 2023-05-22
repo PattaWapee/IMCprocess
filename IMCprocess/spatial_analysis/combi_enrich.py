@@ -41,8 +41,8 @@ def label_marker(binary_df, marker_list):
     for col in df.columns:
         #df.loc[df[col] == 1, col] = col+'+'
         #df.loc[df[col] == 0, col] = col+'-'
-        df.loc[df[col] == 1, col] = '+'
-        df.loc[df[col] == 0, col] = '-'
+        df.loc[df[col] == 1, col] = col+'+'
+        df.loc[df[col] == 0, col] = col+'-'
     df_label = pd.DataFrame(df.apply(lambda row: ''.join(row.astype(str)), axis=1), columns=['label'])
     df_label['label'] = df_label['label'].astype('category')
     return df_label
@@ -91,9 +91,9 @@ def zscore_combinations(cell1_adata, cell1_label_obs,cell2_adata, marker_list ,n
     '''
     Get zscore list of all combinations of columns
     '''
-    zscore_dict = {}
+    zscore_list = []
+    print('start testing marker combination with n = ', n )
     for set in marker_combinations(marker_list, n = n):
-        print('start testing combination: ')
         print(set)
         adata1 = cell1_adata.copy()
         adata2 = cell2_adata.copy()
@@ -101,27 +101,38 @@ def zscore_combinations(cell1_adata, cell1_label_obs,cell2_adata, marker_list ,n
         merged_adata = label_merge_adata(adata1, cell1_label_obs, adata2, set)
         # 3. calculate zscore of neighborhood enrichment
         zscore = get_zscore(merged_adata).iloc[0:(-n_cell1),(-n_cell1):]
-        zscore_dict[tuple(set)] = zscore
-    return zscore_dict
+        zscore_list.append(zscore)
+    zscore_df = pd.concat(zscore_list, axis=0)
+    return zscore_df
 
-## main function to test a function of enrichment of markers combination
-def main():
-    print('Start testing enrichment of markers combination')
-    ## 1. Create random anndata for Two cell types
-    df1 = rand_marker_XY()
-    df2 = rand_marker_XY()
-    df2.index = list(range(1001, 2001))
-    cell1_adata = Img_anndata(dfs=[df1], img_ids=['R1']).adata
-    cell2_adata = Img_anndata(dfs=[df2], img_ids=['R1']).adata
+## main function to find an enrichment of markers combination
+## Find the maximum and minium zscore of markers combination
+def main_combi(cell1_adata, cell1_label_obs,cell2_adata, marker_list):
+    zscore_list = [zscore_combinations(cell1_adata,cell1_label_obs,
+                                       cell2_adata, marker_list, n = n) 
+                   for n in range(2, len(marker_list)+1)]
+    zscore_df = pd.concat(zscore_list, axis=0)
+    # Find the maximum value and its index and column
+    max_value = zscore_df.max().max()
+    max_index = zscore_df.stack().idxmax()
+    max_row, max_col = max_index
 
-    # 2. label cell1 with zzcell1 and cell2 with combination markers + and -
-    #  and merge two cell types and calculate zscore of neighborhood enrichment
+    print("Maximum value:", max_value)
+    print("For marker combination of ", max_row)
+    print("with cell ", max_col)
+    # Find the minimum value and its index and column
+    min_value = zscore_df.min().min()
+    min_index = zscore_df.stack().idxmin()
+    min_row, min_col = min_index
 
-    zscore_df = zscore_combinations(cell1_adata, cell2_adata, n=2)
+    print("Minimum value:", min_value)
+    print("For marker_combination of ", min_row)
+    print("with cell ", max_col)
+
+    return (zscore_df)
+
+
                              
 
-
-if __name__ == '__main__':
-    main()
 
 
