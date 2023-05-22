@@ -64,44 +64,45 @@ def get_zscore(merged_adata):
         zscore: zscore dataframe of each label
     '''
     sa.run_spatial_nhood(merged_adata, 'label', 15)
-    zscore = merged_adata.uns['label_nhood_enrichment']['zscore'][-1]
+    zscore = merged_adata.uns['label_nhood_enrichment']['zscore']
     label_index = merged_adata.obs['label'].cat.categories
-    zscore = pd.DataFrame(zscore[:-1], index=label_index[:-1], columns=[label_index[-1]]).T
+    zscore = pd.DataFrame(zscore, index=label_index, columns=[label_index]).T
     return zscore
 
-def label_merge_adata(cell1_adata, cell2_adata, marker_list):
-    # 1. label cell1 with zzcell1 and cell2 with combination markers + and -
+def label_merge_adata(cell1_adata, cell1_label_obs ,cell2_adata, marker_list):
+    # 1. label cell1 with specific label (level2) column 
+    # and cell2 with combination markers + and -
     cell2_adata = add_obs_label(cell2_adata,marker_list)
-    cell1_adata.obs['label'] = 'cell1' + ''.join(marker_list)
+    cell1_adata.obs['label'] = cell1_adata.obs[cell1_label_obs].astype(str)
     # 2. Merge two cell types
     merged_adata = ad.concat([cell1_adata, cell2_adata], axis=0)
     merged_adata.obs['label'] = merged_adata.obs['label'].astype('category')
     return merged_adata
 
-def col_combinations(adata, n=2):
+def marker_combinations(marker_list, n=2):
     '''
     Return all combinations of columns in a dataframe
     '''
-    combinations = list(itertools.combinations(adata.to_df().columns, n))
+    combinations = list(itertools.combinations(marker_list, n))
     combinations_as_lists = [list(c) for c in combinations]
     return(combinations_as_lists)
 
-def zscore_combinations(cell1_adata, cell2_adata, n=2):
+def zscore_combinations(cell1_adata, cell1_label_obs,cell2_adata, marker_list ,n=2):
     '''
     Get zscore list of all combinations of columns
     '''
-    zscore_ls = []
-    for set in col_combinations(cell2_adata, n = n):
+    zscore_dict = {}
+    for set in marker_combinations(marker_list, n = n):
         print('start testing combination: ')
         print(set)
         adata1 = cell1_adata.copy()
         adata2 = cell2_adata.copy()
-        merged_adata = label_merge_adata(adata1, adata2, set)
+        n_cell1 = len(cell1_adata.obs[cell1_label_obs].unique())
+        merged_adata = label_merge_adata(adata1, cell1_label_obs, adata2, set)
         # 3. calculate zscore of neighborhood enrichment
-        zscore = get_zscore(merged_adata)
-        zscore_ls.append(zscore)
-    zscore_df = pd.concat(zscore_ls, axis=0)
-    return zscore_df
+        zscore = get_zscore(merged_adata).iloc[0:(-n_cell1),(-n_cell1):]
+        zscore_dict[tuple(set)] = zscore
+    return zscore_dict
 
 ## main function to test a function of enrichment of markers combination
 def main():
